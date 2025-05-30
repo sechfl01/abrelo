@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Matrix Love</title>
+  <link rel="stylesheet" href="style.css"/>
+  </head>
+  <body>
+    <canvas id="matrixCanvas"></canvas>
+    <script scr="script.js"></script>
+  </body> 
+     <div class="controls" style="display: none;>
+
+      <label>velocidad:<input type="range" min="1" max="30" volue="10" id="speedControl">
+      </label>
+      <label> color:<input type="color" id="colorPicker" value="#008000">
+      </label>
+      <label>texto:<input type="text" id="textInput"
+      value="eres mi cielo">
+      </label>
+    </div>
+  </html>
+  <style>* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: black;
+}
+
+canvas {
+  display: block;
+}
+
+.controls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 10;
+}
+
+.controls label {
+  display: block;
+  margin-bottom: 5px;
+  color: rgb(13, 13, 13);
+}
+
+
+</style>
+</head>
+<body>
+  <div class="controls" style="display: none;>  
+    
+  <canvas id="matrixCanvas"></canvas>
+  <script>const canvas = document.getElementById("matrixCanvas");
+const ctx = canvas.getContext("2d");
+let speed = 20;
+let message = "eres mi cielo <3 ";
+let color = "#ff69b4";
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let fontSize = 14;
+let columns = canvas.width / fontSize;
+let drops = Array.from({ length: columns }).fill(1);
+
+// CONTROLES
+document.getElementById("speedControl").addEventListener("input", (e) => {
+  speed = parseInt(e.target.value);
+});
+
+document.getElementById("colorPicker").addEventListener("input", (e) => {
+  color = e.target.value;
+});
+
+document.getElementById("textInput").addEventListener("input", (e) => {
+  message = e.target.value;
+});
+
+// EXPLOSIONES AL CLIC
+canvas.addEventListener("click", (e) => {
+  const x = e.clientX;
+  const y = e.clientY;
+  explosion(x, y);
+});
+
+function explosion(x, y) {
+  const parts = 20;
+  for (let i = 0; i < parts; i++) {
+    const angle = (Math.PI * 2 * i) / parts;
+    const dx = Math.cos(angle) * 5;
+    const dy = Math.sin(angle) * 5;
+    animateExplosion(x, y, dx, dy);
+  }
+}
+
+function animateExplosion(x, y, dx, dy) {
+  let life = 30;
+  function frame() {
+    if (life <= 0) return;
+    ctx.fillStyle = color;
+    ctx.font = "bold 16px Arial";
+    ctx.fillText(message, x + dx * (30 - life), y + dy * (30 - life));
+    life--;
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+function draw() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = color;
+  ctx.font = `${fontSize}px Arial`;
+
+  for (let i = 0; i < drops.length; i++) {
+    const text = message;
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    if (drops[i] * fontSize > canvas.height || Math.random() > 0.95) {
+      drops[i] = 0;
+    }
+    drops[i]++;
+  }
+}
+
+function animate() {
+  setTimeout(() => {
+    requestAnimationFrame(animate);
+    draw();
+  }, 1000 / speed);
+}
+
+animate();
+</script>
+</body>
+</html>
